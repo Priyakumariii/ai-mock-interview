@@ -59,38 +59,33 @@ function App() {
   };
 
   const handleLogin = async () => {
+  try {
+    const response = await axios.post(
+      "https://ai-mock-interview-dazi.onrender.com/api/users/login",
+      {
+        email: formData.email,
+        password: formData.password,
+      }
+    );
 
-    try {
+    alert(response.data.message);
 
-      const response = await axios.post(
-        "http://127.0.0.1:5000/api/users/login",
-        {
-          email: formData.email,
-          password: formData.password,
-        }
-      );
+    setIsLoggedIn(true);
 
-      alert(response.data.message);
+    fetchJobs();
 
-      setIsLoggedIn(true);
-
-      fetchJobs();
-
-    // eslint-disable-next-line no-unused-vars
-    } catch (error) {
-
-      alert("Login Error");
-
-    }
-
-  };
+  } catch (error) {
+    alert("Login Error");
+    console.log(error);
+  }
+};
 
   const fetchJobs = async () => {
 
     try {
 
       const response = await axios.get(
-        "http://127.0.0.1:5000/api/jobs"
+        "https://ai-mock-interview-dazi.onrender.com/api/jobs"
       );
 
       setJobs(response.data);
@@ -108,7 +103,7 @@ function App() {
     try {
 
       const response = await axios.post(
-        "http://127.0.0.1:5000/api/jobs/add",
+        "https://ai-mock-interview-dazi.onrender.com/api/jobs/add",
         jobData
       );
 
@@ -137,7 +132,7 @@ function App() {
     try {
 
       await axios.delete(
-        `http://127.0.0.1:5000/api/jobs/${id}`
+        `https://ai-mock-interview-dazi.onrender.com/api/jobs/${id}`
       );
 
       fetchJobs();
