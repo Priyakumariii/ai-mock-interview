@@ -7,8 +7,6 @@ const genAI = new GoogleGenerativeAI(
   process.env.GEMINI_API_KEY
 );
 
-console.log("API KEY EXISTS:", !!process.env.GEMINI_API_KEY);
-
 router.post("/feedback", async (req, res) => {
   try {
     const { answers } = req.body;
@@ -34,8 +32,7 @@ Keep response short and professional.
 
     const result = await model.generateContent(prompt);
 
-    const feedback =
-      result.response.text();
+    const feedback = result.response.text();
 
     res.json({
       success: true,
@@ -43,12 +40,14 @@ Keep response short and professional.
     });
 
   } catch (error) {
-    console.log(error);
+
+    console.error("GEMINI ERROR:", error);
 
     res.status(500).json({
       success: false,
-      message: "AI Feedback Error"
+      message: error.message
     });
+
   }
 });
 
