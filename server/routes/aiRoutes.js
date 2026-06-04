@@ -1,19 +1,15 @@
 const express = require("express");
 const router = express.Router();
 
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const Groq = require("groq-sdk");
 
-const genAI = new GoogleGenerativeAI(
-  process.env.GEMINI_API_KEY
-);
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
+});
 
 router.post("/feedback", async (req, res) => {
   try {
     const { answers } = req.body;
-
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash"
-    });
 
     const prompt = `
 You are an interview evaluator.
@@ -30,24 +26,31 @@ Give:
 Keep response short and professional.
 `;
 
-    const result = await model.generateContent(prompt);
+    const completion = await groq.chat.completions.create({
+      messages: [
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      model: "llama3-8b-8192",
+    });
 
-    const feedback = result.response.text();
+    const feedback =
+      completion.choices[0]?.message?.content ||
+      "No feedback generated";
 
     res.json({
       success: true,
-      feedback
+      feedback,
     });
-
   } catch (error) {
-
-    console.error("GEMINI ERROR:", error);
+    console.error("GROQ ERROR:", error);
 
     res.status(500).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
-
   }
 });
 
