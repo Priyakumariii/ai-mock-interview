@@ -1,10 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
-const pdfParse = require("pdf-parse");
-
-console.log("PDF PARSE:", pdfParse);
-console.log("TYPE:", typeof pdfParse);
+const pdf = require("pdf-parse");
 const Groq = require("groq-sdk");
 
 const groq = new Groq({
@@ -26,7 +23,7 @@ router.post(
         });
       }
 
-      const data = await pdfParse(req.file.buffer);
+      const data = await pdf(req.file.buffer);
 
       const resumeText = data.text;
 
