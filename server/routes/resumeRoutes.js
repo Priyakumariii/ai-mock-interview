@@ -74,4 +74,60 @@ Keep response professional and easy to understand.
   }
 );
 
+router.post(
+  "/questions",
+  upload.single("resume"),
+  async (req, res) => {
+    try {
+      const data = await pdf(req.file.buffer);
+
+      const resumeText = data.text;
+
+      const prompt = `
+Read this resume and generate 5 interview questions.
+
+Resume:
+${resumeText}
+
+Generate:
+1. Technical Questions
+2. Project Questions
+3. HR Questions
+
+Keep questions professional.
+`;
+
+      const completion =
+        await groq.chat.completions.create({
+          messages: [
+            {
+              role: "user",
+              content: prompt,
+            },
+          ],
+          model: "llama-3.1-8b-instant",
+        });
+
+      const questions =
+        completion.choices[0]?.message?.content ||
+        "No questions generated";
+
+      res.json({
+        success: true,
+        questions,
+      });
+
+    } catch (error) {
+
+      console.error(error);
+
+      res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+
+    }
+  }
+);
+
 module.exports = router;
